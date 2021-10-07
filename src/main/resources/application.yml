@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dbauthorizationservice
+    username: postgres
+    password: qwe12345
+    driver-class-name: org.postgresql.Driver
+
+keycloak:
+  realm: Simple-chat
+  auth-server-url: http://localhost:8180/auth
+  ssl-required: external
+  resource: simplechat
+  bearer-only: true
+  cors: false
+  public-client: true
+  principal-attribute: preferred_username
+  credentials:
+    secret: 5cc51cb9-84be-4c03-ba9d-05b9a069f33d
