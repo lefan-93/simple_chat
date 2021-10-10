@@ -230,7 +230,7 @@ Declare Your JDBC Drivers
    - Execute in local Postgres: 
 
 ```postgresql
-UPDATE keyckloak.client SET secret='5cc51cb9-84be-4c03-ba9d-05b9a069f33d' 
+UPDATE keycloak.client SET secret='5cc51cb9-84be-4c03-ba9d-05b9a069f33d' 
 WHERE client_id = 'simplechat'
 ```
 
