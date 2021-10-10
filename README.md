@@ -114,7 +114,7 @@ Declare Your JDBC Drivers
     <datasources>
        ...
        <datasource jndi-name="java:jboss/datasources/KeycloakDS" pool-name="KeycloakDS" enabled="true" use-java-context="true">
-          <connection-url>jdbc:postgresql://localhost:5432/simplechat?currentSchema=keyckloak</connection-url>
+          <connection-url>jdbc:postgresql://localhost:5432/simplechat?currentSchema=keycloak</connection-url>
           <driver>postgresql</driver>
           <pool>
              <max-pool-size>20</max-pool-size>
