@@ -121,7 +121,7 @@ Declare Your JDBC Drivers
           </pool>
           <security>
              <user-name>keycloak</user-name>
-             <password>keycloak</password
+             <password>keycloak</password>
           </security>
        </datasource>
        ...
@@ -229,10 +229,14 @@ Declare Your JDBC Drivers
    
    - Execute in local Postgres: 
 
-```postgresql
-UPDATE keycloak.client SET secret='5cc51cb9-84be-4c03-ba9d-05b9a069f33d' 
-WHERE client_id = 'simplechat'
-```
+#####2.7 Set client secret for application
+
++ Click 'Clients'
++ In the table with clients, click on client id 'simplechat' 
++ Click the Settings tab Credentials
++ Copy field Secret 
++ Go to simple chat project directory ...\src\main\resources and open file application.yml 
++ Paste new secret to keycloak.credentials.secret property 
 
 ####  3. Start Simple-chat app 
 
