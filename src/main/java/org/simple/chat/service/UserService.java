@@ -2,7 +2,6 @@ package org.simple.chat.service;
 
 import lombok.AllArgsConstructor;
 
-import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
@@ -10,13 +9,19 @@ import org.keycloak.authorization.client.util.HttpResponseException;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.simple.chat.model.dto.NewUser;
+import org.simple.chat.controller.exception.ConflictException;
+import org.simple.chat.UserDao;
+import org.simple.chat.model.dto.request.NewUser;
 import org.simple.chat.model.dto.request.AuthenticationRequest;
+import org.simple.chat.model.dto.response.FriendDto;
+import org.simple.chat.model.dto.response.ProfileDto;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -35,12 +40,37 @@ public class UserService {
     private final String clientId;
     private final String secret;
 
-    public void createUser(NewUser newUser) {
+    private final UserDao userDao;
 
-        UserRepresentation keycloakUser = prepareUserRepresentation(newUser);
+    public void createUser(NewUser newUser) throws BadRequestException {
+
+        var keycloakUser = prepareUserRepresentation(newUser);
         keycloak.tokenManager().getAccessToken();
-        Response response = keycloak.realm(realm).users().create(keycloakUser);
+        try (var response = keycloak.realm(realm).users().create(keycloakUser)) {
+            if (response.getStatus() == 409) {
+                if (!keycloak.realm(realm).users().search(newUser.getUsername()).isEmpty()) {
+                    throw new ConflictException("user with username " + newUser.getUsername() + " already exist",
+                        Response.Status.CONFLICT);
+                }
+                if (!keycloak.realm(realm).users().search(null,
+                    null, null,
+                    newUser.getEmail(),
+                    0,
+                    1).isEmpty()) {
+                    throw new ConflictException("user with email " + newUser.getEmail() + " already exist",
+                        Response.Status.CONFLICT);
+                }
+            }
+        }
 
+    }
+
+    public List<FriendDto> findUser(String name) {
+        return userDao.findUserByName(name);
+    }
+
+    public ProfileDto getMeProfile(String userId) {
+        return userDao.findUserById(userId);
     }
 
     public AccessTokenResponse auth(AuthenticationRequest auth) throws HttpResponseException {
@@ -57,8 +87,9 @@ public class UserService {
 
     private UserRepresentation prepareUserRepresentation(NewUser newUser) {
         var password = preparePasswordRepresentation(newUser.getPassword());
-        UserRepresentation user = new UserRepresentation();
+        var user = new UserRepresentation();
         user.setEnabled(true);
+        user.setEmail(newUser.getEmail());
         user.setUsername(newUser.getUsername());
         user.setCredentials(Collections.singletonList(password));
         return user;

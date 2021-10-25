@@ -1,7 +1,9 @@
 package org.simple.chat.controller;
 
 import lombok.AllArgsConstructor;
-import org.simple.chat.model.dto.NewUser;
+import org.simple.chat.model.dto.request.NewUser;
+import org.simple.chat.model.dto.response.FriendDto;
+import org.simple.chat.model.dto.response.ProfileDto;
 import org.simple.chat.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +11,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+import static org.simple.chat.utils.PrincipalUtils.getUserId;
 
 @CrossOrigin
 @RestController
@@ -23,13 +30,17 @@ public class UserController {
 
         userService.createUser(newUser);
 
-        return new ResponseEntity<>("created", HttpStatus.OK);
+        return new ResponseEntity<>("created", HttpStatus.CREATED);
     }
 
     @GetMapping("user")
-    public ResponseEntity<String> getUser() {
+    public ResponseEntity<List<FriendDto>> getUser(@RequestParam String username) {
+        return new ResponseEntity<>(userService.findUser(username), HttpStatus.OK);
+    }
 
-        //userService.auth();
-        return new ResponseEntity<>("test", HttpStatus.OK);
+    @GetMapping("me")
+    public ResponseEntity<ProfileDto> getMeProfile() {
+        String userId = getUserId();
+        return new ResponseEntity<>(userService.getMeProfile(userId), HttpStatus.OK);
     }
 }

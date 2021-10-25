@@ -1,4 +1,4 @@
-package org.simple.chat.model.dto;
+package org.simple.chat.model.dto.request;
 
 import lombok.Data;
 
